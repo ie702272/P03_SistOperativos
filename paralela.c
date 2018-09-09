@@ -18,20 +18,43 @@ float resultado = 0;
 
 void *calculo(void *args)
 {
+	int nthread=*((int *) args);
 	gettimeofday(&tv, NULL); 
  	Itime=tv.tv_usec;
 	float suma = 0;
 	float pi = 0;
-	for(int i = 0;i<iteraciones;i++){//falt ala logica para este pedo
+	long Iteraciones;
+	long i;
+	switch(nthread){
+		case 0: 
+			Iteraciones = 50000000;
+			i = 0;
+			break;
+		case 1: 
+			Iteraciones = 100000000;
+			i = 50000000;
+			break;
+		case 2: 
+			Iteraciones = 150000000;
+			i = 100000000;
+			break;
+		case 3: 
+			Iteraciones = 200000000;
+			i = 150000000;
+			break;
+		}
+
+	for(i;i<Iteraciones;i++){
 		suma = (pow(-1,i))/((2*i)+1);
 		pi = suma + pi;
 	}
-	resultado = suma;
+	resultado = pi;
 }
 
 int main(){
 	
 	int i;
+	int parArr[NTHREADS];
 	pthread_t tid[NTHREADS];
 	
 	gettimeofday(&tv, NULL); 
@@ -39,7 +62,7 @@ int main(){
 
 	for(i=0;i<NTHREADS;i++)
 	{
-		pthread_create(&tid[i],NULL,calculo,NULL);
+		pthread_create(&tid[i],NULL,calculo,(void *) &parArr[i]);
 	}
 	
 	for(i=0;i<NTHREADS;i++)
