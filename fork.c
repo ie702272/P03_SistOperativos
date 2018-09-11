@@ -10,14 +10,17 @@
 
 #define iteraciones 200000000
 
+/*Estructura para tomar el tiempo*/
 struct timeval tv;
+
+/*Variables para guardar los tiempos*/
 time_t Itime;
 time_t Ftime;
 time_t Ptime;
+
+/*Numero de hijo para cada caso*/
 int nhijo = 0;
 int Iteraciones;
-/* pointer to shared memory obect */
-void *ptr;
 
 void* create_shared_memory(size_t size) {
   // Memory buffer will be readable and writable:
@@ -39,14 +42,22 @@ int main(){
 	float suma = 0;
 	float pi = 0;
 	int i=0;
+
+/*Apuntdor para obtener la direccion de la variable resultado*/
 	float *address;
+
+/*Tiempo inicial*/
 	gettimeofday(&tv, NULL); 
- 	Itime=tv.tv_usec;
+ 	Itime=tv.tv_sec;
 	int status;
+
+/*Variable para sumar el cálculo de cada proceso*/
 	float resultado = 0;
 
+/*Crear memoria compartida de tamaño 128*/
 	void* shmem = create_shared_memory(128);
 
+/*Creación de los procesos*/
 	int pid = fork();
 	if(pid==0){
 		nhijo = 1;
@@ -61,19 +72,23 @@ int main(){
 	}
 
 	switch(nhijo){
-		case 0: 
+		case 0: /*Caso papa*/
 			Iteraciones = 50000000;
 			i = 0;
 			for(i;i<Iteraciones;i++){
 				suma = (pow(-1,i))/((2*i)+1);
 				pi = suma + pi;
 			}
+			/*Guardamos el valor de la memoria en la variable resultado*/
 			resultado = *(float*)shmem;
+			/*Le sumamos a resultado el calculo de pi*/
 			resultado = resultado + pi;
+			/*Obtenemos la direccion de memoria de resultado*/
 			address = &resultado;
+			/*Copiamos el valor de la memoria de resultado a la memoria compartida*/
 			memcpy(shmem, address, sizeof(resultado));
 			break;
-		case 1: 
+		case 1: /*Hijo1*/
 			Iteraciones = 100000000;
 			i = 50000000;
 			for(i;i<Iteraciones;i++){
@@ -86,7 +101,7 @@ int main(){
 			memcpy(shmem, address, sizeof(resultado));
 			exit(2);
 			break;
-		case 2: 
+		case 2: /*Hijo2*/
 			Iteraciones = 150000000;
 			i = 100000000;
 			for(i;i<Iteraciones;i++){
@@ -99,7 +114,7 @@ int main(){
 			memcpy(shmem, address, sizeof(resultado));
 			exit(2);
 			break;
-		case 3: 
+		case 3: /*Hijo3*/
 			Iteraciones = 200000000;
 			i = 150000000;
 			for(i;i<Iteraciones;i++){
@@ -115,7 +130,7 @@ int main(){
 		}
 	
 	gettimeofday(&tv, NULL); 
- 	Ftime=tv.tv_usec;
+ 	Ftime=tv.tv_sec;
 	Ptime = Ftime - Itime;
 	printf("%30.28f, tiempo: %ld\n", resultado, Ptime);
 }

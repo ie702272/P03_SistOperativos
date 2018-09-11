@@ -30,11 +30,8 @@ int clone_thread(void *args)
   float pi = 0;
   int i, start, end, Itnum;
   Itnum = *((int *) args);
-  printf("Itnum: %d\n", Itnum);
   start = (iteraciones/NTHREADS)*Itnum;
   end = (iteraciones/NTHREADS)*(Itnum+1);
-  printf("start: %d, end: %d\n", start, end);
-
 for(i=start; i<end; i++)
 {
   suma = (pow(-1,i))/((2*i)+1);
@@ -53,7 +50,7 @@ int main(){
   int args[NTHREADS];
 
   gettimeofday(&tv, NULL);
- 	Itime=tv.tv_usec;
+ 	Itime=tv.tv_sec;
 
   // Allocate the stack
   stack = malloc( FIBER_STACK * NTHREADS);
@@ -89,7 +86,7 @@ int main(){
   // Free the stack
 free( stack );
 gettimeofday(&tv, NULL);
-Ftime=tv.tv_usec;
+Ftime=tv.tv_sec;
 Ptime = Ftime - Itime;
 
 printf("%30.28f, tiempo: %ld\n", resultado, Ptime);
