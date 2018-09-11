@@ -17,12 +17,16 @@
 #define NTHREADS 4
 #define FIBER_STACK 1024*64
 
+/*Estructura para tomar el tiempo*/
 struct timeval tv;
+/*Variables para guardar los tiempos*/
 time_t Itime;
 time_t Ftime;
 time_t Ptime;
 
+/*Variable para guardar el valor de pi*/
 float resultado = 0;
+
 
 int clone_thread(void *args)
 {
@@ -30,8 +34,11 @@ int clone_thread(void *args)
   float pi = 0;
   int i, start, end, Itnum;
   Itnum = *((int *) args);
+  /*Se asigna dependiendo del numero de thread el limite superior en inferior de iteraciones*/
   start = (iteraciones/NTHREADS)*Itnum;
   end = (iteraciones/NTHREADS)*(Itnum+1);
+
+/*calculo de pi*/
 for(i=start; i<end; i++)
 {
   suma = (pow(-1,i))/((2*i)+1);
